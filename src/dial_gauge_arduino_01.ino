@@ -63,6 +63,7 @@ void setUpStepper() {
 
 void setup()
 {
+ Serial.print("Fufu"); 
   setUpGauge(pinREQC1, pinCLKC1, pinDATAC1);  
   setUpGauge(pinREQC2, pinCLKC2, pinDATAC2);  
   setUpStepper();
@@ -175,8 +176,18 @@ void printValues() {
     for(int i = 0; i < 200; i++) {
       if(i > 0)
         Serial.print(";");
-      Serial.print(data[clockIndex][i], decimal);
+      printFloat(data[clockIndex][i]);
     }   
-    Serial.println("") ;
+    Serial.println("");
   }
+}
+
+void printFloat(float value) {
+  int ival = (int)value;
+  int frac = (value - ival) * 100;
+
+  Serial.print(ival);
+  Serial.print(",");
+  if (frac < 10) Serial.print("0");
+    Serial.println(frac);
 }
