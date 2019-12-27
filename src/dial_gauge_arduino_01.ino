@@ -15,10 +15,10 @@
 
 /*  ADJUST AREA START  */
 int stepCounter;
-int steps = 800;
+int steps = 200;
+int stepSize = 4;
 int currentStep = 0;
 int run = 0;
-
 /* pin configuration 1*/
 int pinREQC1 = 14;
 int pinDATAC1 = 2;
@@ -41,13 +41,6 @@ float data[2][200] = {};
 byte digits[13];
 float value;
 
-void setUpClock1() {
-  setUpGauge(pinREQC1, pinCLKC1, pinDATAC1);  
-}
-
-void setUpClock2() {
-  setUpGauge(pinREQC2, pinCLKC2, pinDATAC2);  
-}
 
 void setUpGauge(int pinREQ, int pinCLK, int pinDATA) {
   /*    SERIAL_8N1 (the default)  */
@@ -70,25 +63,24 @@ void setUpStepper() {
 
 void setup()
 {
-  setUpClock1();
-  setUpClock2();
+  setUpGauge(pinREQC1, pinCLKC1, pinDATAC1);  
+  setUpGauge(pinREQC2, pinCLKC2, pinDATAC2);  
   setUpStepper();
+}
+
+void step() {
+    for(int i = 0; i < stepSize; i++) {
+      makeStep();
+      delay(3);
+    }    
+    currentStep++;
 }
 
 void loop()
 {
   if(run < 100) {
-    measureClock1();
-    measureClock2();
-    makeStep();
-    delay(3);
-    makeStep();
-    delay(3);
-    makeStep();
-    delay(3);
-    makeStep();
-    delay(sleep);
-    currentStep+=4;
+    measure();
+    step();
     if(currentStep>=steps) {
       run++;
       printValues();
@@ -97,11 +89,8 @@ void loop()
   }
 }
 
-void measureClock1() {
+void measure() {
   readDialGauge(pinREQC1, pinCLKC1, pinDATAC1, 0);  
-}
-
-void measureClock2() {
   readDialGauge(pinREQC2, pinCLKC2, pinDATAC2, 1);  
 }
 
@@ -116,11 +105,8 @@ void makeStep() {
    Read the dial gauge.
    After a call to this function the array digits[13] contains all data according to the data protocol.
    For normal data reading the first four digits should by all 'F', the function returns false if this is not the case.
-
-
-
 */
-boolean readDialGauge(int pinREQ, int pinCLK, int pinDATA, int clockIndex) {
+void readDialGauge(int pinREQ, int pinCLK, int pinDATA, int clockIndex) {
 
   /**
      Generate request by making REQ active (low level)!
@@ -143,11 +129,10 @@ boolean readDialGauge(int pinREQ, int pinCLK, int pinDATA, int clockIndex) {
 
   digitalWrite(pinREQ, LOW);
 
-
   /* d1-d4 should be all oxF */
-  int header = digits[0] + digits[1] + digits[2] + digits[3];
-  return header == 60 ? true : false;
-  decodeDialGauge(clockIndex);
+  int header = digits[0] + digits[1] + digits[2] + digits[3];  
+  if(header == 60)
+    data[clockIndex][currentStep] = decodeDialGauge(clockIndex);
 }
 
 
@@ -161,8 +146,7 @@ boolean readDialGauge(int pinREQ, int pinCLK, int pinDATA, int clockIndex) {
 
    return (signed) measured value
 */
-
-void decodeDialGauge(int clockIndex) {
+float decodeDialGauge(int clockIndex) {
 
   int units = digits[12];    // 0=mm or 1=inch
   int decimal = digits[11];  // 3 for mm and 5 for inch
@@ -176,7 +160,7 @@ void decodeDialGauge(int clockIndex) {
 
   if (digits[4] == 8)
     value *= -1.0;
-  data[clockIndex][currentStep/4]=value;
+  return value;
 }
 
 /*
@@ -196,5 +180,3 @@ void printValues() {
     Serial.println("") ;
   }
 }
-
-//braun == ehemals rot
