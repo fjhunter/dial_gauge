@@ -15,8 +15,8 @@
 
 /*  ADJUST AREA START  */
 int stepCounter;
-int steps = 200;
-int stepSize = 4;
+#define steps  800
+int stepSize = 1;
 int currentStep = 0;
 int run = 0;
 /* pin configuration 1*/
@@ -25,16 +25,16 @@ int pinDATAC1 = 2;
 int pinCLKC1 = 3;
 
 /* pin configuration 2*/
-int pinREQC2 = 14;
-int pinDATAC2 = 2;
-int pinCLKC2 = 3;
+int pinREQC2 = 19;
+int pinDATAC2 = 18;
+int pinCLKC2 = 15;
 
 /* pooling intervall */
-int sleep = 300;
+int sleep = 50;
 /* baudrate */
 int bd = 9600;
 
-float data[2][200] = {};
+float data[2][steps] = {};
 /*  ADJUST AREA END  */
 
 /* Keep FIXED! - data protocol format */
@@ -71,16 +71,17 @@ void setup()
 void step() {
     for(int i = 0; i < stepSize; i++) {
       makeStep();
-      delay(3);
+      delay(0.01);
     }    
     currentStep++;
 }
 
 void loop()
 {
-  if(run < 100) {
+  if(run < 10) {
     measure();
     step();
+    delay(sleep);
     if(currentStep>=steps) {
       run++;
       printValues();
@@ -172,11 +173,12 @@ void printValues() {
   int decimal = digits[11];// 3 for mm and 5 for inch
  
   for(int clockIndex = 0; clockIndex < 2; clockIndex++) {    
-    for(int i = 0; i < 200; i++) {
+    for(int i = 0; i < steps; i++) {
       if(i > 0)
         Serial.print(";");
-      Serial.print(data[clockIndex][i], decimal);
+        Serial.print(data[clockIndex][i], decimal);
+      
     }   
-    Serial.println("") ;
+    Serial.println("");
   }
 }
