@@ -63,6 +63,7 @@ void setUpStepper() {
 
 void setup()
 {
+  delay(50);
   setUpGauge(pinREQC1, pinCLKC1, pinDATAC1);  
   setUpGauge(pinREQC2, pinCLKC2, pinDATAC2);  
   setUpStepper();
