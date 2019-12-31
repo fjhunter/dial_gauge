@@ -177,9 +177,26 @@ void printValues() {
     for(int i = 0; i < steps; i++) {
       if(i > 0)
         Serial.print(";");
+<<<<<<< HEAD
         Serial.print(data[clockIndex][i], decimal);
       
+=======
+      printFloat(data[clockIndex][i]);
+>>>>>>> 0146ed937ea9f1f5c006b498140327a04f8fc631
     }   
     Serial.println("");
   }
 }
+<<<<<<< HEAD
+=======
+
+void printFloat(float value) {
+  int ival = (int)value;
+  int frac = (value - ival) * 100;
+
+  Serial.print(ival);
+  Serial.print(",");
+  if (frac < 10) Serial.print("0");
+    Serial.print(frac);
+}
+>>>>>>> 0146ed937ea9f1f5c006b498140327a04f8fc631
