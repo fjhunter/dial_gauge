@@ -1,21 +1,8 @@
-//weiss =schawz
-//rot = gelb
-
-
-//rl-bild
-//scharz = orange
-//gruen = blaz
-
-/* minimal solution - reading gauge indicator (here a device from Absolute-System)
-   @author torsten roehl
-   @see this code is based on https://www.instructables.com/id/Interfacing-a-Digital-Micrometer-to-a-Microcontrol/
-   (there is a little big in the code from instructables - only ocurs for high inch values! )
-*/
-
-
-/*  ADJUST AREA START  */
 int stepCounter;
 #define steps  800
+#define SET_UP_TIME 10000
+#define SLEEP_AFTER_STEP 50
+#define SLEEP_AFTER_MEASURE 300
 int stepSize = 1;
 int currentStep = 0;
 int run = 0;
@@ -29,8 +16,6 @@ int pinREQC2 = 19;
 int pinDATAC2 = 18;
 int pinCLKC2 = 15;
 
-/* pooling intervall */
-int sleep = 50;
 /* baudrate */
 int bd = 9600;
 
@@ -63,7 +48,7 @@ void setUpStepper() {
 
 void setup()
 {
-  delay(50);
+  delay(SET_UP_TIME);
   setUpGauge(pinREQC1, pinCLKC1, pinDATAC1);  
   setUpGauge(pinREQC2, pinCLKC2, pinDATAC2);  
   setUpStepper();
@@ -79,10 +64,11 @@ void step() {
 
 void loop()
 {
-  if(run < 10) {
+  if(run < 10) {  
     measure();
+    delay(SLEEP_AFTER_MEASURE);
     step();
-    delay(sleep);
+    delay(SLEEP_AFTER_STEP);
     if(currentStep>=steps) {
       run++;
       printValues();
@@ -177,26 +163,8 @@ void printValues() {
     for(int i = 0; i < steps; i++) {
       if(i > 0)
         Serial.print(";");
-<<<<<<< HEAD
-        Serial.print(data[clockIndex][i], decimal);
-      
-=======
-      printFloat(data[clockIndex][i]);
->>>>>>> 0146ed937ea9f1f5c006b498140327a04f8fc631
+        Serial.print(data[clockIndex][i], decimal);      
     }   
     Serial.println("");
   }
 }
-<<<<<<< HEAD
-=======
-
-void printFloat(float value) {
-  int ival = (int)value;
-  int frac = (value - ival) * 100;
-
-  Serial.print(ival);
-  Serial.print(",");
-  if (frac < 10) Serial.print("0");
-    Serial.print(frac);
-}
->>>>>>> 0146ed937ea9f1f5c006b498140327a04f8fc631
